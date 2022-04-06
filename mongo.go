@@ -1,6 +1,7 @@
 package hzmgo
 
 import (
+	"context"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -17,6 +18,27 @@ func NewMgo(db *mongo.Database) *Mgo {
 		tableMap,
 	}
 	return ret
+}
+
+func CreateMgo(url string, dbname string) (*Mgo, error) {
+	clientOptions := options.Client().ApplyURI(url)
+
+	client, err := mongo.Connect(context.TODO(), clientOptions)
+
+	if err != nil {
+		return nil, err
+	}
+
+	err = client.Ping(context.TODO(), nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	db := client.Database(dbname)
+
+	mgo := NewMgo(db)
+	return mgo, nil
 }
 
 func (m *Mgo) SetTableMap(data map[string]string) {
