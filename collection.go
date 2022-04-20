@@ -82,6 +82,11 @@ func (coll *Collection) InsertOne(ctx context.Context, document interface{}, opt
 }
 
 func (coll *Collection) InsertMany(ctx context.Context, document interface{}, opt... *options.InsertManyOptions) (*mongo.InsertManyResult, error) {
+	if reflect.ValueOf(document).Len() == 0 {
+		ret := &mongo.InsertManyResult{}
+		ret.InsertedIDs = make([]interface{}, 0)
+		return ret, nil
+	}
 	list := make([]interface{}, 0)
 	for i := 0; i < reflect.ValueOf(document).Len(); i++ {
 		data := reflect.ValueOf(document).Index(i).Interface()
